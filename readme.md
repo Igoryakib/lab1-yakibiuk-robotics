@@ -5,7 +5,7 @@
 
 ```bash
 cd ~
-git clone [https://github.com/RybOlya/robotics_lpnu.git](https://github.com/Igoryakib/lab1-yakibiuk-robotics.git)
+git clone https://github.com/Igoryakib/lab1-yakibiuk-robotics.git
 cd lab1-yakibiuk-robotics
 ```
 
