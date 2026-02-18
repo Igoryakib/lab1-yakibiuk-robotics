@@ -5,8 +5,8 @@
 
 ```bash
 cd ~
-git clone https://github.com/RybOlya/robotics_lpnu.git
-cd robotics_lpnu
+git clone [https://github.com/RybOlya/robotics_lpnu.git](https://github.com/Igoryakib/lab1-yakibiuk-robotics.git)
+cd lab1-yakibiuk-robotics
 ```
 
 ### 2. Build Docker Image
@@ -17,13 +17,34 @@ cd robotics_lpnu
 
 This takes 10-15 minutes on first run.
 
-### 3. Run Container
+### 3. Install and open VScode
+
+```bash
+code .
+```
+
+### 4. Run Container
 
 ```bash
 ./scripts/cmd run
 ```
-### 4. Install and open VScode
+
+### 4. Run Gazebo
 
 ```bash
-code .
+gz sim /opt/ws/src/code/lab1/worlds/robot.sdf
+```
+
+### 5. In another terminal run next code to run our robot
+
+```bash
+gz topic -t "/cmd_vel" -m gz.msgs.Twist -p "linear: {x: 0.5}, angular: {z: 0.05}"
+```
+
+Don't forget run the simulation.
+
+### 5. For gathering data from Lidar run this code
+
+```bash
+gz topic -e -t /lidar
 ```
