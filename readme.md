@@ -43,7 +43,7 @@ gz topic -t "/cmd_vel" -m gz.msgs.Twist -p "linear: {x: 0.5}, angular: {z: 0.05}
 
 Don't forget run the simulation.
 
-### 5. In another terminal run this code for gathering data from Lidar run this code
+### 5. In another terminal run this code for gathering data from Lidar
 
 ```bash
 gz topic -e -t /lidar
