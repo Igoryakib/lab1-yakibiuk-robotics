@@ -1,6 +1,5 @@
 # Lab 1: Building Robot in Gazebo
 
-
 ### 1. Clone Repository
 
 ```bash
