@@ -5,6 +5,19 @@ Python package that integrates velocity commands (from `/cmd_vel` topic) to esti
 
 ## Setup
 
+Launch the Docker container:
+```bash
+./scripts/cmd build-docker
+```
+
+## Launch
+
+Launch the Docker container:
+```bash
+./scripts/cmd run
+```
+
+## Build
 ```bash
 cd /opt/ws
 colcon build --packages-select lab3 lab4
