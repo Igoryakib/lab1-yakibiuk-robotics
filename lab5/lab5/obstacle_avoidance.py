@@ -18,7 +18,7 @@ class ObstacleAvoidanceNode(Node):
         self.declare_parameter("goal_x", 2.2)
         self.declare_parameter("goal_y", 3.5)
 
-        # --- НАЛАШТУВАННЯ СИЛ (Тюнінг для проходження перешкод) ---
+        # НАЛАШТУВАННЯ
         self.k_att = 0.7          # Сила тяги до цілі 
         self.k_rep = 0.4          # Сила відштовхування 
         self.k_tangent = 1.5      # Сила "обтікання" 
@@ -54,7 +54,7 @@ class ObstacleAvoidanceNode(Node):
         if not self.odom_received:
             return
 
-        # 1. Розрахунок дистанції до цілі
+        # Розрахунок дистанції до цілі
         dx = self.goal_x - self.robot_x
         dy = self.goal_y - self.robot_y
         dist_to_goal = math.sqrt(dx**2 + dy**2)
@@ -65,7 +65,7 @@ class ObstacleAvoidanceNode(Node):
         else:
             f_att_x, f_att_y = 0.0, 0.0
 
-        # 3. Сила відштовхування (Repulsive Force)
+        # Сила відштовхування (Repulsive Force)
         f_rep_x = 0.0
         f_rep_y = 0.0
         rays_count = 0
@@ -74,7 +74,6 @@ class ObstacleAvoidanceNode(Node):
         angle_inc = msg.angle_increment
 
         for i, dist in enumerate(msg.ranges):
-            # Ігноруємо сміття та сам корпус
             if math.isinf(dist) or math.isnan(dist) or dist < 0.20:
                 continue
 
@@ -82,7 +81,6 @@ class ObstacleAvoidanceNode(Node):
                 obs_angle = angle_min + (i * angle_inc) + self.robot_yaw
                 rep_mag = self.k_rep * (1.0/dist - 1.0/self.dist_threshold) / (dist**2)
                 
-                # ФІКС 1: Жорсткий ліміт на силу відштовхування
                 rep_mag = min(rep_mag, 3.0) 
 
                 f_rep_x -= rep_mag * math.cos(obs_angle)
@@ -93,7 +91,6 @@ class ObstacleAvoidanceNode(Node):
             f_rep_x /= rays_count
             f_rep_y /= rays_count
             
-            # ФІКС 2: "Розумна" дотична сила (обтікання стіни)
             t_left_x, t_left_y = -f_rep_y, f_rep_x
             t_right_x, t_right_y = f_rep_y, -f_rep_x
             
@@ -110,7 +107,7 @@ class ObstacleAvoidanceNode(Node):
             f_rep_x += tangent_x
             f_rep_y += tangent_y
 
-        # 4. Сумарний вектор руху
+        # Сумарний вектор руху
         total_x = f_att_x + f_rep_x
         total_y = f_att_y + f_rep_y
 
@@ -119,7 +116,7 @@ class ObstacleAvoidanceNode(Node):
         angle_err = target_yaw - self.robot_yaw
         angle_err = math.atan2(math.sin(angle_err), math.cos(angle_err)) # Нормалізація від -pi до pi
 
-        # 5. Створення команди руху
+        # Створення команди руху
         cmd = TwistStamped()
         cmd.header.stamp = self.get_clock().now().to_msg()
         cmd.header.frame_id = 'base_link'
@@ -132,11 +129,8 @@ class ObstacleAvoidanceNode(Node):
         else:
             # ЛОГІКА РУХУ
             if abs(angle_err) > 1.0: 
-                # Якщо треба сильно розвернутися (> 57 градусів), стоїмо на місці і крутимось
                 cmd.twist.linear.x = 0.0
             else:
-                # Їдемо вперед. Швидкість падає, якщо ми дивимось не зовсім туди
-                # max() захищає від їзди задом
                 forward_speed = min(0.2, 0.5 * dist_to_goal)
                 cmd.twist.linear.x = forward_speed * max(0.0, math.cos(angle_err))
             
